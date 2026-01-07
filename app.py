@@ -60,9 +60,10 @@ div.stButton > button:first-child:contains("Predict") {
 .prediction-box {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start; 
     align-items: center;
-    height: 280px; 
+    padding-top: 0px;
+    margin-top: 0px;
 }
 
 .instruction-text {
@@ -120,9 +121,9 @@ else:
             if isinstance(st.session_state.prediction, (int, np.integer)):
                 st.markdown(
                     f"""
-                    <div style="text-align:center; color:#4b4b4b; line-height:1;">
-                        <p style="font-size:22px; font-weight:700; margin:0;">You drew:</p>
-                        <span style="font-size:160px; font-weight:900; color:#2ecc71; display:block;">
+                    <div style="text-align:center; color:#4b4b4b; line-height:1.2;">
+                        <p style="font-size:24px; font-weight:700; margin:0; padding:0;">You drew:</p>
+                        <span style="font-size:180px; font-weight:900; color:#2ecc71; display:block; margin:0; padding:0;">
                             {st.session_state.prediction}
                         </span>
                     </div>
