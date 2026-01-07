@@ -3,7 +3,6 @@ import numpy as np
 import joblib
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
-import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Digit Recognizer", page_icon="✍️", layout="centered")
 
@@ -13,39 +12,50 @@ def load_model():
 
 model = load_model()
 
-params = st.experimental_get_query_params()
-
 if "show_canvas" not in st.session_state:
-    st.session_state.show_canvas = "draw" in params
+    st.session_state.show_canvas = False
 if "prediction" not in st.session_state:
     st.session_state.prediction = None
 if "canvas_key" not in st.session_state:
     st.session_state.canvas_key = "canvas_1"
 
+st.markdown("""
+<style>
+/* center draw section */
+.draw-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+}
+
+/* text above button */
+.draw-text {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+/* BIG circular button */
+button[data-testid="stButton"] {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    font-size: 32px !important;
+    font-weight: 800;
+}
+</style>
+""", unsafe_allow_html=True)
+
 if not st.session_state.show_canvas:
-    components.html(
-        """
-        <div style="text-align:center;">
-            <p style="font-size:18px;margin-bottom:20px;">
-                Click draw to make me recognize what you draw!
-            </p>
-            <button
-                onclick="parent.window.location.search='?draw=1'"
-                style="
-                    width:200px;
-                    height:200px;
-                    border-radius:50%;
-                    font-size:32px;
-                    font-weight:800;
-                    border:none;
-                    cursor:pointer;
-                ">
-                DRAW
-            </button>
-        </div>
-        """,
-        height=320
+    st.markdown("<div class='draw-container'>", unsafe_allow_html=True)
+    st.markdown(
+        "<div class='draw-text'>Click draw to make me recognize what you draw!</div>",
+        unsafe_allow_html=True
     )
+    if st.button("DRAW"):
+        st.session_state.show_canvas = True
+        st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
 
 else:
     if st.session_state.prediction is not None:
