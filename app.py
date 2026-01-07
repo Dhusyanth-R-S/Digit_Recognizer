@@ -30,7 +30,7 @@ st.markdown("""
 }
 
 .draw-text {
-    font-size: 22px;
+    font-size: 24px;
     margin-bottom: 25px;
     color: #4b4b4b;
     font-weight: 600;
@@ -70,7 +70,7 @@ div.stButton > button:first-child:contains("Predict") {
 if not st.session_state.show_canvas:
     st.markdown("<div class='draw-container'>", unsafe_allow_html=True)
     st.markdown(
-        "<div class='draw-text'>Click draw to make me recognize what you draw!</div>",
+        "<div class='draw-text'>Click DRAW to make me predict what you draw (0 to 9)</div>",
         unsafe_allow_html=True
     )
     if st.button("DRAW"):
@@ -101,7 +101,7 @@ else:
                     f"""
                     <div style="text-align:center; color:#4b4b4b; font-size:24px; font-weight:700;">
                         You drew: 
-                        <span style="font-size:100px; font-weight:900; color:#2ecc71; display:block; line-height:1;">
+                        <span style="font-size:110px; font-weight:900; color:#2ecc71; display:block; line-height:1;">
                             {st.session_state.prediction}
                         </span>
                     </div>
