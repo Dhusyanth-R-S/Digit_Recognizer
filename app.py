@@ -93,20 +93,9 @@ with right:
                 if canvas.image_data is None:
                     st.stop()
 
-                # ✅ CORRECT: convert to grayscale (MATCHES TRAINING)
                 img = canvas.image_data[:, :, :3].mean(axis=2).astype(np.uint8)
 
-                ys, xs = np.where(img > 10)
-                if len(xs) == 0 or len(ys) == 0:
-                    st.session_state.prediction = None
-                    st.rerun()
-
-                x_min, x_max = xs.min(), xs.max()
-                y_min, y_max = ys.min(), ys.max()
-
-                digit = img[y_min:y_max+1, x_min:x_max+1]
-
-                digit_28 = Image.fromarray(digit).resize(
+                digit_28 = Image.fromarray(img).resize(
                     (28, 28),
                     resample=Image.BILINEAR
                 )
