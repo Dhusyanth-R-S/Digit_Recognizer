@@ -34,6 +34,12 @@ st.markdown("""
     text-align: center;
     margin-bottom: 10px;
 }
+.warning {
+    font-size: 28px;
+    font-weight: bold;
+    color: #e67e22;
+    text-align: center;
+}
 .draw-btn button {
     font-size: 48px !important;
     height: 120px;
@@ -62,10 +68,16 @@ with right:
 
     else:
         if st.session_state.prediction is not None:
-            st.markdown(
-                f"<div class='prediction'>{st.session_state.prediction}</div>",
-                unsafe_allow_html=True
-            )
+            if isinstance(st.session_state.prediction, int):
+                st.markdown(
+                    f"<div class='prediction'>{st.session_state.prediction}</div>",
+                    unsafe_allow_html=True
+                )
+            else:
+                st.markdown(
+                    f"<div class='warning'>{st.session_state.prediction}</div>",
+                    unsafe_allow_html=True
+                )
         else:
             st.markdown("<div class='prediction'> </div>", unsafe_allow_html=True)
 
@@ -102,6 +114,13 @@ with right:
 
                 X = np.array(digit_28, dtype=np.uint8).reshape(1, -1)
 
-                pred = model.predict(X)[0]
-                st.session_state.prediction = int(pred)
+                probs = model.predict_proba(X)[0]
+                best_prob = probs.max()
+                pred = probs.argmax()
+
+                if best_prob < 0.6:
+                    st.session_state.prediction = "Please redraw"
+                else:
+                    st.session_state.prediction = int(pred)
+
                 st.rerun()
