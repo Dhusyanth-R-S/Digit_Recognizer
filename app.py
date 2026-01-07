@@ -56,11 +56,9 @@ left, right = st.columns([1, 2])
 with right:
 
     if not st.session_state.show_canvas:
-        st.markdown('<div class="draw-btn">', unsafe_allow_html=True)
         if st.button("D R A W"):
             st.session_state.show_canvas = True
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
 
     else:
         if st.session_state.prediction is not None:
@@ -85,22 +83,37 @@ with right:
         c1, c2 = st.columns([1, 4])
 
         with c1:
-            st.markdown('<div class="clear-btn">', unsafe_allow_html=True)
             if st.button("Clear"):
-                st.session_state.canvas_key = f"canvas_{np.random.randint(0, 1_000_000)}"
+                st.session_state.canvas_key = f"canvas_{np.random.randint(1_000_000)}"
                 st.session_state.prediction = None
                 st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
 
         with c2:
-            st.markdown('<div class="predict-btn">', unsafe_allow_html=True)
             if st.button("Predict"):
                 if canvas.image_data is not None:
+
                     img = canvas.image_data[:, :, 3]
-                    img = Image.fromarray(img).resize((28, 28))
-                    img = np.array(img).astype(np.float32)
-                    img = img.reshape(1, -1)
-                    pred = model.predict(img)[0]
+
+                    ys, xs = np.where(img > 0)
+                    if len(xs) == 0 or len(ys) == 0:
+                        st.session_state.prediction = None
+                        st.rerun()
+
+                    x_min, x_max = xs.min(), xs.max()
+                    y_min, y_max = ys.min(), ys.max()
+
+                    digit = img[y_min:y_max+1, x_min:x_max+1]
+
+                    digit = Image.fromarray(digit).resize(
+                        (20, 20),
+                        resample=Image.NEAREST
+                    )
+
+                    canvas_28 = np.zeros((28, 28), dtype=np.uint8)
+                    canvas_28[4:24, 4:24] = np.array(digit, dtype=np.uint8)
+
+                    canvas_28 = canvas_28.reshape(1, -1)
+
+                    pred = model.predict(canvas_28)[0]
                     st.session_state.prediction = int(pred)
                     st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
