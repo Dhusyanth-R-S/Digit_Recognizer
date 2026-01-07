@@ -4,8 +4,6 @@ import joblib
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 
-# -------------------- CONFIG --------------------
-
 st.set_page_config(
     page_title="Digit Recognizer",
     page_icon="✍️",
@@ -18,8 +16,6 @@ def load_model():
 
 model = load_model()
 
-# -------------------- SESSION STATE --------------------
-
 if "show_canvas" not in st.session_state:
     st.session_state.show_canvas = False
 
@@ -28,8 +24,6 @@ if "prediction" not in st.session_state:
 
 if "canvas_key" not in st.session_state:
     st.session_state.canvas_key = "canvas_1"
-
-# -------------------- STYLES --------------------
 
 st.markdown("""
 <style>
@@ -57,8 +51,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# -------------------- LAYOUT --------------------
-
 left, right = st.columns([1, 2])
 
 with right:
@@ -67,6 +59,7 @@ with right:
         st.markdown('<div class="draw-btn">', unsafe_allow_html=True)
         if st.button("D R A W"):
             st.session_state.show_canvas = True
+            st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
     else:
@@ -96,7 +89,7 @@ with right:
             if st.button("Clear"):
                 st.session_state.canvas_key = f"canvas_{np.random.randint(0, 1_000_000)}"
                 st.session_state.prediction = None
-                st.experimental_rerun()
+                st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
 
         with c2:
@@ -108,8 +101,7 @@ with right:
                     img = np.array(img)
                     img = img / 255.0
                     img = img.reshape(1, -1)
-
                     pred = model.predict(img)[0]
                     st.session_state.prediction = int(pred)
-                    st.experimental_rerun()
+                    st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
