@@ -60,7 +60,7 @@ Although notebook metrics improved significantly after retraining, the most impo
 
 ### Checkout the app here 
 
-https://digitrecognizer-by-dhusya.streamlit.app/
+[🚀 Live App Link](https://digitrecognizer-by-dhusya.streamlit.app/)
 
 ---
 
