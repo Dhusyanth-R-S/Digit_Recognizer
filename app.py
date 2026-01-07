@@ -18,111 +18,144 @@ if "prediction" not in st.session_state:
     st.session_state.prediction = None
 if "canvas_key" not in st.session_state:
     st.session_state.canvas_key = "canvas_1"
-if "celebrate" not in st.session_state:
-    st.session_state.celebrate = False
 
 st.markdown("""
 <style>
 body {
     background-color: #0e1117;
 }
-.hint {
+
+.top-hint {
     text-align: center;
     font-size: 18px;
-    color: #bbbbbb;
-    margin-bottom: 20px;
+    color: #cfcfcf;
+    margin-bottom: 18px;
 }
-.draw-big button {
-    font-size: 42px !important;
-    height: 110px;
-    width: 100%;
+
+.draw-circle {
+    display: flex;
+    justify-content: center;
 }
-.prediction-box {
+.draw-circle button {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    font-size: 26px !important;
+    font-weight: 700;
+}
+
+.prediction {
     font-size: 72px;
     font-weight: 800;
     color: #2ecc71;
     text-align: center;
-    animation: pop 0.6s ease-out;
+    animation: slide 0.5s ease-out;
 }
-@keyframes pop {
-    0% { transform: translateY(-30px) scale(0.7); opacity: 0; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
+
+@keyframes slide {
+    0% { transform: translateY(-20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
 }
+
 .warning {
     font-size: 28px;
     font-weight: 700;
     color: #f39c12;
     text-align: center;
 }
+
 .button-row {
     display: flex;
     justify-content: space-between;
-    gap: 10px;
+    align-items: center;
+    gap: 12px;
 }
+
 .clear-btn button {
-    height: 38px;
-    font-size: 14px !important;
+    height: 36px;
     width: 90px;
+    font-size: 14px !important;
 }
+
 .predict-btn button {
-    height: 60px;
-    font-size: 22px !important;
+    height: 70px;
     width: 100%;
-    background-color: #2ecc71 !important;
-    color: black !important;
-    font-weight: 700;
+    font-size: 26px !important;
+    font-weight: 800;
+    background-color: #7bed9f !important;
+    color: #000000 !important;
+}
+
+@media (min-width: 768px) {
+    .layout {
+        display: flex;
+        gap: 40px;
+        align-items: center;
+    }
+    .prediction {
+        text-align: left;
+        font-size: 88px;
+    }
 }
 </style>
 """, unsafe_allow_html=True)
 
 if not st.session_state.show_canvas:
-    st.markdown("<div class='hint'>Click draw to make me recognize what you draw!</div>", unsafe_allow_html=True)
-    if st.container().button("D R A W", key="draw", help="Start drawing"):
+    st.markdown("<div class='top-hint'>Click draw to make me recognize what you draw!</div>", unsafe_allow_html=True)
+    st.markdown("<div class='draw-circle'>", unsafe_allow_html=True)
+    if st.button("DRAW"):
         st.session_state.show_canvas = True
         st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
+
 else:
-    if st.session_state.prediction is not None:
-        if isinstance(st.session_state.prediction, int):
-            st.markdown(f"<div class='prediction-box'>{st.session_state.prediction}</div>", unsafe_allow_html=True)
-            if st.session_state.celebrate:
-                st.balloons()
-                st.session_state.celebrate = False
-        else:
-            st.markdown(f"<div class='warning'>{st.session_state.prediction}</div>", unsafe_allow_html=True)
-    else:
-        st.markdown("<div class='prediction-box'>&nbsp;</div>", unsafe_allow_html=True)
+    st.markdown("<div class='layout'>", unsafe_allow_html=True)
 
-    canvas = st_canvas(
-        fill_color="rgba(255,255,255,1)",
-        stroke_width=18,
-        stroke_color="#FFFFFF",
-        background_color="#000000",
-        width=280,
-        height=280,
-        drawing_mode="freedraw",
-        key=st.session_state.canvas_key
-    )
+    left, right = st.columns([1, 1])
 
-    st.markdown("<div class='button-row'>", unsafe_allow_html=True)
-    c1, c2 = st.columns([1, 3])
-    with c1:
-        if st.button("Clear", key="clear"):
-            st.session_state.canvas_key = f"canvas_{np.random.randint(1_000_000)}"
-            st.session_state.prediction = None
-            st.rerun()
-    with c2:
-        if st.button("Predict", key="predict"):
-            if canvas.image_data is None:
-                st.stop()
-            img = canvas.image_data[:, :, :3].mean(axis=2).astype(np.uint8)
-            digit_28 = Image.fromarray(img).resize((28, 28), resample=Image.BILINEAR)
-            X = np.array(digit_28, dtype=np.uint8).reshape(1, -1)
-            probs = model.predict_proba(X)[0]
-            best_prob = probs.max()
-            pred = probs.argmax()
-            if best_prob < 0.6:
-                st.session_state.prediction = "Please redraw"
+    with left:
+        if st.session_state.prediction is not None:
+            if isinstance(st.session_state.prediction, int):
+                st.markdown(f"<div class='prediction'>{st.session_state.prediction}</div>", unsafe_allow_html=True)
             else:
-                st.session_state.prediction = int(pred)
-                st.session_state.celebrate = True
-            st.rerun()
+                st.markdown(f"<div class='warning'>{st.session_state.prediction}</div>", unsafe_allow_html=True)
+        else:
+            st.markdown("<div class='prediction'>&nbsp;</div>", unsafe_allow_html=True)
+
+        canvas = st_canvas(
+            fill_color="rgba(255,255,255,1)",
+            stroke_width=18,
+            stroke_color="#FFFFFF",
+            background_color="#000000",
+            width=280,
+            height=280,
+            drawing_mode="freedraw",
+            key=st.session_state.canvas_key
+        )
+
+        c1, c2 = st.columns([1, 3])
+        with c1:
+            if st.button("Clear"):
+                st.session_state.canvas_key = f"canvas_{np.random.randint(1_000_000)}"
+                st.session_state.prediction = None
+                st.rerun()
+        with c2:
+            if st.button("Predict"):
+                if canvas.image_data is None:
+                    st.stop()
+                img = canvas.image_data[:, :, :3].mean(axis=2).astype(np.uint8)
+                digit_28 = Image.fromarray(img).resize((28, 28), resample=Image.BILINEAR)
+                X = np.array(digit_28, dtype=np.uint8).reshape(1, -1)
+                probs = model.predict_proba(X)[0]
+                best_prob = probs.max()
+                pred = probs.argmax()
+                if best_prob < 0.6:
+                    st.session_state.prediction = "Please redraw"
+                else:
+                    st.session_state.prediction = int(pred)
+                st.rerun()
+
+    with right:
+        pass
+
+    st.markdown("</div>", unsafe_allow_html=True)
