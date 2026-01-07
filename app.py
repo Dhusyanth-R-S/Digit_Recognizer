@@ -62,13 +62,13 @@ else:
         if isinstance(st.session_state.prediction, int):
             st.markdown(
                 f"""
-                <div style="text-align:center;
-                            font-size:48px;
-                            font-weight:800;
-                            color:#2ecc71;">
-                    You drew: {st.session_state.prediction}
+                <div style="text-align:center; color:white; font-size:28px; font-weight:400;">
+                    You drew: 
+                    <span style="font-size:60px; font-weight:900; color:#2ecc71; display:block;">
+                        {st.session_state.prediction}
+                    </span>
                 </div>
-                """,
+                """, 
                 unsafe_allow_html=True
             )
         else:
