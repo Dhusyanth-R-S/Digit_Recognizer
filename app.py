@@ -4,7 +4,6 @@ import joblib
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 
-# Page configuration
 st.set_page_config(page_title="Digit Recognizer", page_icon="✍️", layout="centered")
 
 @st.cache_resource
@@ -13,7 +12,6 @@ def load_model():
 
 model = load_model()
 
-# Initialize Session States
 if "show_canvas" not in st.session_state:
     st.session_state.show_canvas = False
 if "prediction" not in st.session_state:
@@ -21,10 +19,8 @@ if "prediction" not in st.session_state:
 if "canvas_key" not in st.session_state:
     st.session_state.canvas_key = "canvas_1"
 
-# Custom CSS
 st.markdown("""
 <style>
-/* 1. Landing Page Styles */
 .draw-container {
     display: flex;
     flex-direction: column;
@@ -36,11 +32,10 @@ st.markdown("""
 .draw-text {
     font-size: 22px;
     margin-bottom: 25px;
-    color: #4b4b4b; /* Neutral gray for light/dark mode */
+    color: #4b4b4b;
     font-weight: 600;
 }
 
-/* Big DRAW button styling */
 .draw-container div.stButton > button {
     width: 180px !important;
     height: 180px !important;
@@ -52,26 +47,18 @@ st.markdown("""
     border: none !important;
 }
 
-/* 2. Canvas Page - Predict Button Styling */
-/* We target the button with the label 'Predict' */
-div[data-testid="stVerticalBlock"] div.stButton > button:first-child:contains("Predict") {
+div.stButton > button:first-child:contains("Predict") {
     background-color: #2ecc71 !important;
     color: white !important;
-    font-size: 20px !important;
-    padding: 10px 30px !important;
-    font-weight: 700 !important;
+    font-size: 24px !important;
+    padding: 15px 45px !important;
+    font-weight: 800 !important;
     border: none !important;
-}
-
-/* Align Predict button to the right */
-.predict-col {
-    display: flex;
-    justify-content: flex-end;
+    width: 100% !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# --- FIRST PAGE (Landing) ---
 if not st.session_state.show_canvas:
     st.markdown("<div class='draw-container'>", unsafe_allow_html=True)
     st.markdown(
@@ -83,9 +70,7 @@ if not st.session_state.show_canvas:
         st.rerun()
     st.markdown("</div>", unsafe_allow_html=True)
 
-# --- SECOND PAGE (Canvas & Prediction) ---
 else:
-    # Display Prediction Result (Color updated for visibility)
     if st.session_state.prediction is not None:
         if isinstance(st.session_state.prediction, (int, np.integer)):
             st.markdown(
@@ -105,7 +90,6 @@ else:
                 unsafe_allow_html=True
             )
 
-    # Drawing Canvas
     canvas = st_canvas(
         fill_color="rgba(255,255,255,1)",
         stroke_width=20,
@@ -117,9 +101,7 @@ else:
         key=st.session_state.canvas_key
     )
 
-    # Layout for Predict (Right-aligned) and Clear (Standard)
-    # First Row: Predict on the right
-    col_empty, col_predict = st.columns([2, 1])
+    col_empty, col_predict = st.columns([1.5, 1])
     with col_predict:
         if st.button("Predict"):
             if canvas.image_data is not None:
@@ -137,7 +119,6 @@ else:
                     st.session_state.prediction = int(pred)
                 st.rerun()
 
-    # Second Row: Clear button as it was
     if st.button("Clear"):
         st.session_state.canvas_key = f"canvas_{np.random.randint(1_000_000)}"
         st.session_state.prediction = None
