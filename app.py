@@ -90,30 +90,35 @@ with right:
 
         with c2:
             if st.button("Predict"):
-                if canvas.image_data is not None:
+                if canvas.image_data is None:
+                    st.stop()
 
-                    img = canvas.image_data[:, :, 3]
+                # 1️⃣ Extract alpha channel (exactly like training)
+                img = canvas.image_data[:, :, 3]
 
-                    ys, xs = np.where(img > 0)
-                    if len(xs) == 0 or len(ys) == 0:
-                        st.session_state.prediction = None
-                        st.rerun()
-
-                    x_min, x_max = xs.min(), xs.max()
-                    y_min, y_max = ys.min(), ys.max()
-
-                    digit = img[y_min:y_max+1, x_min:x_max+1]
-
-                    digit = Image.fromarray(digit).resize(
-                        (20, 20),
-                        resample=Image.NEAREST
-                    )
-
-                    canvas_28 = np.zeros((28, 28), dtype=np.uint8)
-                    canvas_28[4:24, 4:24] = np.array(digit, dtype=np.uint8)
-
-                    canvas_28 = canvas_28.reshape(1, -1)
-
-                    pred = model.predict(canvas_28)[0]
-                    st.session_state.prediction = int(pred)
+                # 2️⃣ Get bounding box of drawn digit
+                ys, xs = np.where(img > 0)
+                if len(xs) == 0 or len(ys) == 0:
+                    st.session_state.prediction = None
                     st.rerun()
+
+                x_min, x_max = xs.min(), xs.max()
+                y_min, y_max = ys.min(), ys.max()
+
+                digit = img[y_min:y_max+1, x_min:x_max+1]
+
+                # 3️⃣ Resize DIRECTLY to 28×28 (CRITICAL FIX)
+                digit_28 = Image.fromarray(digit).resize(
+                    (28, 28),
+                    resample=Image.BILINEAR
+                )
+
+                digit_28 = np.array(digit_28, dtype=np.uint8)
+
+                # 4️⃣ Flatten row-major, keep 0–255
+                X = digit_28.reshape(1, -1)
+
+                # 5️⃣ Predict
+                pred = model.predict(X)[0]
+                st.session_state.prediction = int(pred)
+                st.rerun()
