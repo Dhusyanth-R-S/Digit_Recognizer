@@ -93,11 +93,10 @@ with right:
                 if canvas.image_data is None:
                     st.stop()
 
-                # 1️⃣ Extract alpha channel (exactly like training)
-                img = canvas.image_data[:, :, 3]
+                # ✅ CORRECT: convert to grayscale (MATCHES TRAINING)
+                img = canvas.image_data[:, :, :3].mean(axis=2).astype(np.uint8)
 
-                # 2️⃣ Get bounding box of drawn digit
-                ys, xs = np.where(img > 0)
+                ys, xs = np.where(img > 10)
                 if len(xs) == 0 or len(ys) == 0:
                     st.session_state.prediction = None
                     st.rerun()
@@ -107,18 +106,13 @@ with right:
 
                 digit = img[y_min:y_max+1, x_min:x_max+1]
 
-                # 3️⃣ Resize DIRECTLY to 28×28 (CRITICAL FIX)
                 digit_28 = Image.fromarray(digit).resize(
                     (28, 28),
                     resample=Image.BILINEAR
                 )
 
-                digit_28 = np.array(digit_28, dtype=np.uint8)
+                X = np.array(digit_28, dtype=np.uint8).reshape(1, -1)
 
-                # 4️⃣ Flatten row-major, keep 0–255
-                X = digit_28.reshape(1, -1)
-
-                # 5️⃣ Predict
                 pred = model.predict(X)[0]
                 st.session_state.prediction = int(pred)
                 st.rerun()
