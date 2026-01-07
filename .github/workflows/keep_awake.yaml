@@ -1,0 +1,22 @@
+name: Keep App Awake
+
+on:
+  schedule:
+    - cron: '0 */10 * * *' 
+  workflow_dispatch:     
+
+jobs:
+  keep_awake:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create Empty Commit
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "Keep-alive ping for Streamlit deployment"
+          git push
