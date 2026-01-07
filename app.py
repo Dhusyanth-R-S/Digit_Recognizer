@@ -13,57 +13,38 @@ def load_model():
 
 model = load_model()
 
+params = st.experimental_get_query_params()
+
 if "show_canvas" not in st.session_state:
-    st.session_state.show_canvas = False
+    st.session_state.show_canvas = "draw" in params
 if "prediction" not in st.session_state:
     st.session_state.prediction = None
 if "canvas_key" not in st.session_state:
     st.session_state.canvas_key = "canvas_1"
-if "draw_clicked" not in st.session_state:
-    st.session_state.draw_clicked = False
 
 if not st.session_state.show_canvas:
-    st.markdown(
-        "<h3 style='text-align:center;'>Click draw to make me recognize what you draw!</h3>",
-        unsafe_allow_html=True
-    )
-
-    clicked = components.html(
+    components.html(
         """
-        <div style="display:flex;justify-content:center;">
-            <button onclick="parent.postMessage('draw', '*')"
-            style="
-                width:200px;
-                height:200px;
-                border-radius:50%;
-                font-size:32px;
-                font-weight:800;
-                border:none;
-                cursor:pointer;
-            ">
+        <div style="text-align:center;">
+            <p style="font-size:18px;margin-bottom:20px;">
+                Click draw to make me recognize what you draw!
+            </p>
+            <button onclick="window.location.search='?draw=1'"
+                style="
+                    width:200px;
+                    height:200px;
+                    border-radius:50%;
+                    font-size:32px;
+                    font-weight:800;
+                    border:none;
+                    cursor:pointer;
+                ">
                 DRAW
             </button>
         </div>
-        <script>
-        window.addEventListener("message", (e) => {
-            if (e.data === "draw") {
-                const streamlitDoc = window.parent.document;
-                const buttons = streamlitDoc.querySelectorAll("button[kind='secondary']");
-                buttons.forEach(b => {
-                    if (b.innerText === "HIDDEN_DRAW_TRIGGER") {
-                        b.click();
-                    }
-                });
-            }
-        });
-        </script>
         """,
-        height=240
+        height=300
     )
-
-    if st.button("HIDDEN_DRAW_TRIGGER"):
-        st.session_state.show_canvas = True
-        st.rerun()
 
 else:
     if st.session_state.prediction is not None:
