@@ -29,7 +29,8 @@ if not st.session_state.show_canvas:
             <p style="font-size:18px;margin-bottom:20px;">
                 Click draw to make me recognize what you draw!
             </p>
-            <button onclick="window.location.search='?draw=1'"
+            <button
+                onclick="parent.window.location.search='?draw=1'"
                 style="
                     width:200px;
                     height:200px;
@@ -43,7 +44,7 @@ if not st.session_state.show_canvas:
             </button>
         </div>
         """,
-        height=300
+        height=320
     )
 
 else:
